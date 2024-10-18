@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>search</title>
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+    <div style="display: flex;">
+        <div class="title" style="width: 10%;">
+            <a href="main.html">main</a>
+            <a href="search.html">search</a>
+            <a href="fundraiser.html">details</a>
+        </div>
+        <div class="box" style="width: 90%;">
+            <div style="display: flex;justify-content: flex-end;align-items: center;width: 100%;">
+                <a href="javascript:void(0);" onclick="Query()" style="margin: 30px;">Query</a>
+                <label for="CATEGORYID">CATEGORYID： </label>
+                <select name="CATEGORYID" style="width: 200px;height: 20px;" class="form-control" id="CATEGORYID">
+                </select>
+                <a href="javascript:void(0);" onclick="Clear()" style="margin: 30px;">reset</a>
+            </div>
+            <div id="body">
+
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function ajax(obj) {
+            let type = obj.type;
+            let url = obj.url;
+            let callback = obj.callback;
+            let xhr = new XMLHttpRequest();
+            xhr.open(type, url);
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                callback(JSON.parse(xhr.responseText));
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function init() {
+            console.log('init');
+            ajax({
+                url: "http://localhost:5000/Fundraisers/List",
+                type: "get",
+                callback: function (data) {
+                    console.log(data);
+                    if (data.length) {
+                        let tbodyinnerHTML = ''
+                        data.map((item) => {
+                            tbodyinnerHTML += `<option value=${item.CATEGORYID}>${item.NAME}</option>`
+                        })
+                        document.getElementById("CATEGORYID").innerHTML = tbodyinnerHTML;
+                        document.getElementById('CATEGORYID').value = ''
+                    }
+                }
+            });
+        };
+        init()
+        function gotodetailes (e){
+            location.href = `./fundraiser.html?${e}`
+        }
+        function Query() {
+            let CATEGORYID = document.getElementById('CATEGORYID').value
+            ajax({
+                url: `http://localhost:5000/Fundraisers/getOneFundraiser?CATEGORYID=${CATEGORYID}`,
+                type: "get",
+                callback: function (data) {
+                    console.log(data);
+                    let tbodyinnerHTML = ''
+                    data.map((item) => {
+                        tbodyinnerHTML += `
+                        <div style="display: flex;">
+                        <div style="margin: 10px;" class="serchbox">
+                            <label>FUNDRAISERID:</label>
+                            <a href="fundraiser.html?${item.FUNDRAISERID}"><span id="FUNDRAISERID" style="color:#f0f; cursor: pointer;">${item.FUNDRAISERID}</span></a>
+                            
+                            <label>ORGANIZER:</label>
+                            <span id="ORGANIZER">${item.ORGANIZER}</span>
+                            <label>CAPTION:</label>
+                            <span id="CAPTION">${item.CAPTION}</span>
+                            <label>TARGET_FUNDING:</label>
+                            <span id="TARGET_FUNDING">${item.TARGET_FUNDING}</span>
+                            <label>CURRENT_FUNDING:</label>
+                            <span id="CURRENT_FUNDING">${item.CURRENT_FUNDING}</span>
+                            <label>CITY:</label>
+                            <span id="CITY">${item.CITY}</span>
+                            <label>ACTIVE:</label>
+                            <span id="ACTIVE">${item.ACTIVE}</span>
+                            <label>CATEGORYID:</label>
+                            <span id="CATEGORYID">${item.CATEGORYID}</span>
+                        </div>
+                    </div>
+                        `
+                    })
+                    document.getElementById("body").innerHTML = tbodyinnerHTML;
+
+                }
+            });
+        };
+        function Clear() {
+            document.getElementById('CATEGORYID').value = ''
+        };
+
+    </script>
+</body>
+
+</html>

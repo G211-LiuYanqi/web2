@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <title>main</title>
+    <link rel="stylesheet" href="./css/main.css">
+</head>
+
+<body>
+    <div style="display: flex;">
+        <div class="title" style="width: 10%;">
+            <a href="main.html">main</a>
+            <a href="search.html">search</a>
+            <a href="fundraiser.html">details</a>
+        </div>
+        <div class="box" id="box" style="width: 90%;display: flex;flex-wrap: wrap;">
+            <div class="boxS">
+                <div class="row"><span>FUNDRAISERID</span></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function ajax(obj) {
+            let type = obj.type;
+            let url = obj.url;
+            let callback = obj.callback;
+            let xhr = new XMLHttpRequest();
+            xhr.open(type, url);
+            xhr.send();
+            xhr.onreadystatechange = function () {
+                callback(JSON.parse(xhr.responseText));
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function init() {
+            console.log('init');
+            ajax({
+                url: "http://localhost:5000/Fundraisers/getActiveFundraisers?active=Active",
+                type: "get",
+                callback: function (data) {
+                    console.log(data);
+                    if (data.length) {
+                        let tbodyinnerHTML = ''
+                        data.map((item) => {
+                            tbodyinnerHTML += `
+                            <div class="boxS">
+                                <div class="row"><span>FUNDRAISERID: </span>${item.FUNDRAISERID}</div>
+                                <div class="row"><span>ORGANIZER: </span>${item.ORGANIZER}</div>
+                                <div class="row"><span>CAPTION: </span>${item.CAPTION}</div>
+                                <div class="row"><span>TARGET_FUNDING: </span>${item.TARGET_FUNDING}</div>
+                                <div class="row"><span>CURRENT_FUNDING: </span>${item.CURRENT_FUNDING}</div>
+                                <div class="row"><span>CITY: </span>${item.CITY}</div>
+                                <div class="row"><span>ACTIVE: </span>${item.ACTIVE}</div>
+                                <div class="row"><span>CATEGORYID: </span>${item.CATEGORYID}</div>
+                            </div>
+                            `
+                        })
+                        document.getElementById("box").innerHTML = tbodyinnerHTML;
+                    }
+                }
+            });
+        };
+        init()
+    </script>
+</body>
+
+</html>
